@@ -59,22 +59,27 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { push } = useRouter();
   const theme = useTheme();
-  const path = !localStorage.getItem("path")
-    ? localStorage.setItem("path", "Dashboard")
-    : localStorage.getItem("path");
+  const [path, setPath] = useState("Dashboard");
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selected, setSelected] = useState<any>(path);
   useEffect(() => {
-    if (localStorage.getItem("path") !== pathname) {
-      const pathto = !localStorage.getItem("path2")
-        ? "/"
-        : `${localStorage.getItem("path2")}`;
-      console.log(pathto);
-
-      push(`${pathto}`);
+    // Access localStorage only on the client side
+    const storedPath = localStorage.getItem("path");
+    if (storedPath) {
+      setPath(storedPath);
+      setSelected(storedPath);
+    } else {
+      localStorage.setItem("path", "Dashboard");
     }
   }, []);
+  const [selected, setSelected] = useState<any>(path);
+  useEffect(() => {
+    if (path !== pathname) {
+      const pathto = localStorage.getItem("path2") || "/";
+      console.log(pathto);
+      push(pathto);
+    }
+  }, [pathname, path, push]);
   return (
     <Box
       sx={{
